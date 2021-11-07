@@ -30,42 +30,99 @@ namespace HarbourLauncher
     {
         Tools tools = new Tools();
         public Dictionary<string, string> javaList = new();
-        public string LoginMode = "Offline";
+        #region 启动模式枚举
+        /// <summary>
+        /// 启动模式枚举
+        /// </summary>
+        public enum LoginMode
+        {
+            /// <summary>
+            /// 离线
+            /// </summary>
+            Offline,
+            /// <summary>
+            /// mojang登录
+            /// </summary>
+            Online,
+            /// <summary>
+            /// 微软登录
+            /// </summary>
+            Microsoft,
+        }
+        public LoginMode loginMode = new();
+        #endregion
+        #region 启动参数
         public string Minecraft_Token;
         public string uuid;
         public string name;
         public bool Online = false;
+        #endregion
+        SquareMinecraftLauncher.MinecraftDownload minecraftDownload = new();
+        Gac.DownLoadFile downLoadFile = new Gac.DownLoadFile();
+        ImageBrush redstone_lamp = new ImageBrush() { ImageSource = new BitmapImage(new Uri(@"Assets/redstone_lamp.png", UriKind.RelativeOrAbsolute)) };
+        ImageBrush redstone_lamp_on = new ImageBrush() { ImageSource = new BitmapImage(new Uri(@"Assets/redstone_lamp_on.png", UriKind.RelativeOrAbsolute)) };
         public MCVersionList[] mcVersionList = new MCVersionList[1].ToArray();
+        int tryCount = 0;
+        #region 版本枚举
+        public enum VersionEnum
+        {
+            /// <summary>
+            /// 快照版
+            /// </summary>
+            alpha,
+            /// <summary>
+            /// 正式版
+            /// </summary>
+            release,
+            /// <summary>
+            /// 所有版本
+            /// </summary>
+            all
+        }
+        VersionEnum versionEnum = new();
+        #endregion
 
         public MainWindow()
         {
             InitializeComponent();
-            tools.DownloadSourceInitialization(DownloadSource.bmclapiSource);
             ServicePointManager.DefaultConnectionLimit = 512;
+            Initialize();
+        }
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        public void Initialize()
+        {
+            versionEnum = VersionEnum.release;
+            tools.DownloadSourceInitialization(DownloadSource.bmclapiSource);
             MinecraftListGet();
             try
             {
-                JavaCombo.ItemsSource = tools.GetJavaPath();
+                if (JavaCombo.Items.Count != 0)
+                    JavaCombo.ItemsSource = tools.GetJavaPath();
                 JavaCombo.SelectedItem = JavaCombo.Items[0];
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "初始化错误");
+                //MessageBox.Show(e.Message, "初始化错误");
             }
 
             try
             {
-
-                verCombo.ItemsSource = tools.GetAllTheExistingVersion();
-                IndexverCombo.ItemsSource = verCombo.ItemsSource;
-                verCombo.SelectedItem = verCombo.Items[0];
-                IndexverCombo.SelectedItem = verCombo.Items[0];
+                if (tools.GetAllTheExistingVersion().Count() != 0)
+                {
+                    verCombo.ItemsSource = tools.GetAllTheExistingVersion();
+                    IndexverCombo.ItemsSource = tools.GetAllTheExistingVersion();
+                }
+                if (verCombo.Items.Count != 0)
+                    verCombo.SelectedItem = verCombo.Items[0];
+                if (IndexverCombo.Items.Count != 0)
+                    IndexverCombo.SelectedItem = verCombo.Items[0];
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "初始化错误");
+                //MessageBox.Show(e.Message, "初始化错误");
             }
-
         }
         /// <summary>
         /// 获取所有java
@@ -78,21 +135,75 @@ namespace HarbourLauncher
         }
         public async void MinecraftListGet()
         {
-            #region 获取下载版本列表
-            await tools.GetMCVersionList();
-            #endregion
+            try
+            {
+                #region 获取下载版本列表
+                await tools.GetMCVersionList();
+                await tools.GetMCVersionList().ContinueWith(x =>
+                {
+                    mcVersionList = tools.GetMCVersionList().Result;
+                    //MCVersionList[] mcVer = new MCVersionList[tools.GetMCVersionList().Result.Count()];
+                    #region 筛选
+                    //if (versionEnum == VersionEnum.release)
+                    //{
+                    //    foreach(var i in mcVersionList)
+                    //    {
+                    //        if(i.type == "正式版")
+                    //        {
+                                
+                    //            mcVer.Append(i);   
+                    //        }
+                    //    }
+                        
+                    //}
+                    //else if(versionEnum == VersionEnum.release)
+                    //{
+                    //    foreach(var i in mcVersionList)
+                    //    {
+                    //        if(i.type == "快照版")
+                    //        {
+                    //            mcVer.Append(i);
+                    //        }
+                    //    }
+                        
+                    //}
+                    //else if (versionEnum == VersionEnum.all)
+                    //{
+                    //    mcVer = mcVersionList;
+                    //}
+                    //mcVersionList = mcVer;
+                    #endregion
+                    this.Dispatcher.Invoke(() => { mcVersionDataGrid.ItemsSource = mcVersionList; });
+                    
+                });
+                #endregion
+            }
+            catch (Exception e)
+            {
+                tryCount++;
+                if (tryCount < 5)
+                {
+                    MinecraftListGet();
+                }
+                else
+                {
+                    MessageBox.Show("获取版本列表错误");
+                }
+
+            }
+
         }
 
         private void Support(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/FriendShip-Studio/HarbourLauncher/issues/");
+            Process.Start("https://github.com/BiDuang/");
         }
 
         private void HamburgerMenuControl_OnItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs e)
         {
             this.HamburgerMenuControl.Content = e.InvokedItem;
 
-            if (!e.IsItemOptions && HamburgerMenuControl.IsPaneOpen)
+            if (!e.IsItemOptions && this.HamburgerMenuControl.IsPaneOpen)
             {
                 // You can close the menu if an item was selected
                 // this.HamburgerMenuControl.SetCurrentValue(HamburgerMenuControl.IsPaneOpenProperty, false);
@@ -109,20 +220,20 @@ namespace HarbourLauncher
                     FileComplete();
 
                     if (JavaCombo.Text != string.Empty && verCombo.Text != string.Empty)
-                        if (LoginMode == "Offline" && playerName.Text != string.Empty)
+                        if (loginMode == LoginMode.Offline && playerName.Text != string.Empty)
                         {
                             StartGame.Title = "正在启动";
                             OfflineLogin();
                         }
-                        else if (LoginMode == "Microsoft")
+                        else if (loginMode == LoginMode.Microsoft)
                         {
                             StartGame.Title = "正在启动";
-                            Game game = new();//声明对象
+                            Game game = new Game();//声明对象
                             await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), name, uuid, Minecraft_Token, "", "");
                             game.ErrorEvent += Game_ErrorEvent;
                             game.LogEvent += Game_LogEvent;
                         }
-                        else if (LoginMode == "Mojang")
+                        else if (loginMode == LoginMode.Online)
                         {
                             StartGame.Title = "正在启动";
                             MojangLogin();
@@ -172,33 +283,37 @@ namespace HarbourLauncher
         //微软
         public void MicrosoftLogin()
         {
-            LoginMode = "Microsoft";
-            bool auto = false;
-            if (IsLocalAccount.IsOn)
-            {
-                auto = true;    //true是登录电脑设置里的微软账户，false是登录其他账户
-            }
-            MicrosoftLogin microsoftLogin = new();
-            Xbox XboxLogin = new();
+            loginMode = LoginMode.Microsoft;
+            bool auto = false;//true是登录电脑设置里的微软账户，false是登录其他账户
+            MicrosoftLogin microsoftLogin = new MicrosoftLogin();
+            Xbox XboxLogin = new Xbox();
             try
             {
                 Minecraft_Token = new MinecraftLogin().GetToken(XboxLogin.XSTSLogin(XboxLogin.GetToken(microsoftLogin.GetToken(microsoftLogin.Login(auto)).access_token)));
-                MinecraftLogin minecraftlogin = new();
-                MinecraftLoginToken Minecraft = minecraftlogin.GetMincraftuuid(Minecraft_Token);
-                uuid = Minecraft.uuid;
-                name = Minecraft.name;
-                MicrosoftLoginStat.Text = "微软登录成功";
             }
             catch (Exception Err)
             {
-                LoginMode = "Mojang";
-                MicrosoftLoginStat.Text = Err.Message + " 请重试";
+                if (Err.Message == "用户取消登录")
+                {
+
+                    MessageBox.Show("您取消了登录，因此登录未完成", "微软登录");
+                }
+                else
+                {
+                    MessageBox.Show("我们遇到了一个预料之外的问题，因此登录未完成", "微软登录");
+                }
+                loginMode = LoginMode.Online;
             }
+
+            MinecraftLogin minecraftlogin = new MinecraftLogin();
+            MinecraftLoginToken Minecraft = minecraftlogin.GetMincraftuuid(Minecraft_Token);
+            uuid = Minecraft.uuid;
+            name = Minecraft.name;
         }
         //正版
         public async void MojangLogin()
         {
-            Game game = new();//声明对象
+            Game game = new Game();//声明对象
             await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), MojangAccount.Text.Trim(), MojangPassword.Password.Trim());
             game.ErrorEvent += Game_ErrorEvent;
             game.LogEvent += Game_LogEvent;
@@ -237,14 +352,13 @@ namespace HarbourLauncher
                 {
                     AuthLogin.Visibility = Visibility.Visible;
                     UnAuthLogin.Visibility = Visibility.Hidden;
-                    LoginMode = "Mojang";
+                    loginMode = LoginMode.Online;
                 }
                 else
                 {
                     AuthLogin.Visibility = Visibility.Hidden;
                     UnAuthLogin.Visibility = Visibility.Visible;
-                    LoginMode = "Offline";
-                    MicrosoftLoginStat.Text = "";
+                    loginMode = LoginMode.Offline;
                 }
             }
         }
@@ -253,7 +367,6 @@ namespace HarbourLauncher
         {
             MicrosoftLogin();
         }
-
         public void FileComplete()
         {
             Gac.DownLoadFile downLoadFile = new Gac.DownLoadFile();
@@ -263,10 +376,57 @@ namespace HarbourLauncher
             }
             downLoadFile.StartDown(0);
         }
+        /// <summary>
+        /// 游戏文件下载bmclapi
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // changeTobmclapi.Background = redstone_lamp_on;
+            tools.DownloadSourceInitialization(DownloadSource.bmclapiSource);
+        }
 
+        /// <summary>
+        /// 下载按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var v = minecraftDownload.MCjarDownload(((MCVersionList)mcVersionDataGrid.SelectedItem).id);
+            downLoadFile.AddDown(v.Url, v.path);
+            var v1 = minecraftDownload.MCjsonDownload(((MCVersionList)mcVersionDataGrid.SelectedItem).id);
+            downLoadFile.AddDown(v1.Url, v1.path);
+            downLoadFile.StartDown(3);
+            downLoadFile.doSendMsg += DownLoadFile_doSendMsg;
+
+
+        }
+
+        private void DownLoadFile_doSendMsg(Gac.DownMsg msg)
+        {
+
+        }
+
+        /// <summary>
+        /// 重新找版本
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            if (tools.GetAllTheExistingVersion().Count() != 0)
+            {
+                verCombo.ItemsSource = tools.GetAllTheExistingVersion();
+                IndexverCombo.ItemsSource = tools.GetAllTheExistingVersion();
+            }
+        }
         private void MicrosoftSettings_Click(object sender, RoutedEventArgs e)
         {
             MicrosoftSettingsFlyout.IsOpen = true;
         }
     }
+
 }
+

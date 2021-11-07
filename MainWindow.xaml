@@ -97,14 +97,14 @@
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
 
-        <mah:HamburgerMenu x:Name="HamburgerMenuControl"
+        <Controls:HamburgerMenu x:Name="HamburgerMenuControl"
                           DisplayMode="CompactOverlay"
                           HamburgerWidth="48"
                           ItemInvoked="HamburgerMenuControl_OnItemInvoked"
                           ItemTemplate="{StaticResource HamburgerMenuItem}"
                           OptionsItemTemplate="{StaticResource HamburgerOptionsMenuItem}">
             <!--  Header  -->
-            <mah:HamburgerMenu.HamburgerMenuHeaderTemplate>
+            <Controls:HamburgerMenu.HamburgerMenuHeaderTemplate>
                 <DataTemplate>
                     <TextBlock HorizontalAlignment="Center"
                    VerticalAlignment="Center"
@@ -112,13 +112,13 @@
                    Foreground="White"
                    Text="菜单" />
                 </DataTemplate>
-            </mah:HamburgerMenu.HamburgerMenuHeaderTemplate>
+            </Controls:HamburgerMenu.HamburgerMenuHeaderTemplate>
 
             <!--  Items  -->
-            <mah:HamburgerMenu.ItemsSource>
-                <mah:HamburgerMenuItemCollection>
-                    <mah:HamburgerMenuGlyphItem Glyph="/Assets/grass.png" Label=" 主页">
-                        <mah:HamburgerMenuGlyphItem.Tag>
+            <Controls:HamburgerMenu.ItemsSource>
+                <Controls:HamburgerMenuItemCollection>
+                    <Controls:HamburgerMenuGlyphItem Glyph="/Assets/grass.png" Label=" 主页">
+                        <Controls:HamburgerMenuGlyphItem.Tag>
                             <Grid>
                                 <TextBlock Text="启动版本" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,150,190" Width="80" Height="30" FontSize="18"/>
                                 <ComboBox x:Name="IndexverCombo" DisplayMemberPath="version" Width="200" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" MaxDropDownHeight="300" Margin="0,0,30,160"
@@ -137,10 +137,10 @@
                                     Kind="PlaySolid" />
                                 </Controls:Tile>
                             </Grid>
-                        </mah:HamburgerMenuGlyphItem.Tag>
-                    </mah:HamburgerMenuGlyphItem>
-                    <mah:HamburgerMenuGlyphItem Glyph="/Assets/command_block.png" Label=" Minecraft设置">
-                        <mah:HamburgerMenuGlyphItem.Tag>
+                        </Controls:HamburgerMenuGlyphItem.Tag>
+                    </Controls:HamburgerMenuGlyphItem>
+                    <Controls:HamburgerMenuGlyphItem Glyph="/Assets/command_block.png" Label=" Minecraft设置">
+                        <Controls:HamburgerMenuGlyphItem.Tag>
                             <Grid>
                                 <TextBlock Text="Java环境" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,35,0,0" Width="80" Height="20" FontSize="18"/>
                                 <ComboBox x:Name="JavaCombo" DisplayMemberPath="Version" SelectedValuePath="Path" Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" MaxDropDownHeight="300" Margin="110,30,0,0"/>
@@ -152,7 +152,7 @@
 
                                 <Grid  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,120,0,0" Width="774">
                                     <TextBlock Text="正版登录" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,5,0,0" Width="80" Height="25" FontSize="18"/>
-                                    <mah:ToggleSwitch  x:Name="IsAuth" OffContent="         停用" OnContent="         启用" Toggled="ToggleSwitch_Toggled" VerticalAlignment="Top" Margin="150,0,0,0" FontSize="18" FontFamily="Microsoft YaHei UI" Width="150" Height="30" MinWidth="0" />
+                                    <Controls:ToggleSwitch  x:Name="IsAuth" OffContent="         停用" OnContent="         启用" Toggled="ToggleSwitch_Toggled" VerticalAlignment="Top" Margin="150,0,0,0" FontSize="18" FontFamily="Microsoft YaHei UI" Width="150" Height="30" MinWidth="0" />
                                     <Grid x:Name="AuthLogin" Visibility="Hidden">
                                         <TextBlock Text="点击按钮进行微软登录。或者，您也可以直接使用右侧的Mojang账户登录。" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,35,0,0" Width="600" Height="20" FontSize="15"/>
                                         <TextBlock Text="* : 完成Minecraft账户迁移的玩家只能使用微软登录" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,55,0,0" Width="600" Height="20" FontSize="13" Foreground="Gray"/>
@@ -182,30 +182,30 @@
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </mah:HamburgerMenuGlyphItem.Tag>
-                    </mah:HamburgerMenuGlyphItem>
-                    <mah:HamburgerMenuGlyphItem Glyph="/Assets/furnace.png" Label=" 启动器设置">
-                        <mah:HamburgerMenuGlyphItem.Tag>
+                        </Controls:HamburgerMenuGlyphItem.Tag>
+                    </Controls:HamburgerMenuGlyphItem>
+                    <Controls:HamburgerMenuGlyphItem Glyph="/Assets/furnace.png" Label=" 启动器设置">
+                        <Controls:HamburgerMenuGlyphItem.Tag>
                             <Grid>
                                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0"
                                 FontSize="19" Foreground="DarkGoldenrod" FontWeight="Bold"
                                 Text="功能开发中"/>
                             </Grid>
-                        </mah:HamburgerMenuGlyphItem.Tag>
-                    </mah:HamburgerMenuGlyphItem>
-                    <mah:HamburgerMenuGlyphItem Glyph="/Assets/chest.png"  Label=" 文件下载">
-                        <mah:HamburgerMenuGlyphItem.Tag>
+                        </Controls:HamburgerMenuGlyphItem.Tag>
+                    </Controls:HamburgerMenuGlyphItem>
+                    <Controls:HamburgerMenuGlyphItem Glyph="/Assets/chest.png"  Label=" 文件下载">
+                        <Controls:HamburgerMenuGlyphItem.Tag>
                             <Grid>
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0"
+                                <!--<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0"
                                 FontSize="19" Foreground="DarkGoldenrod" FontWeight="Bold"
-                                Text="功能开发中"/>
-                                <!--<Grid Height="140" VerticalAlignment="Top">
-                                    <Label Content="选择下载途径" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0"></Label>
-                                    <Label Content="bmclapi" Margin="5,80,0,0" FontSize="15"></Label>
+                                Text="功能开发中"/>-->
+                                <Grid Height="140" VerticalAlignment="Top">
+                                    <Label Content="选择下载途径" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0"/>
+                                    <Label Content="bmclapi" Margin="5,80,0,0" FontSize="15"/>
                                     <Button x:Name="changeTobmclapi" HorizontalAlignment="Left" Width="48" Height="48" Margin="40,60,0,0" Style="{DynamicResource MahApps.Styles.Button.Circle}">
                                         <Button.ContentTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
+                                                <StackPanel>
                                                     <iconPacks:PackIconFontAwesome Width="22" Height="22"
                                                         VerticalAlignment="Center" Kind="ServerSolid"/>
                                                 </StackPanel>
@@ -214,35 +214,33 @@
                                     </Button>
                                 </Grid>
                                 <Grid Height="310" Width="500">
-                                    <Button Height="30" Width="60" Content="下载" HorizontalAlignment="Right" Margin="0,0,10,0"></Button>
-                                    <DataGrid Height="250" SelectionMode="Single" ScrollViewer.CanContentScroll="True" AutoGenerateColumns="True" x:Name="mcVersionDataGrid" HorizontalAlignment="Left" VerticalAlignment="Center" ></DataGrid>
-                                </Grid>-->
+                                    <Button Click="Button_Click_1" Height="30" Width="60" Content="下载" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+                                    <DataGrid Height="250" SelectionMode="Single" ScrollViewer.CanContentScroll="True" AutoGenerateColumns="True" x:Name="mcVersionDataGrid" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                </Grid>
                             </Grid>
 
-                        </mah:HamburgerMenuGlyphItem.Tag>
-                    </mah:HamburgerMenuGlyphItem>
-                </mah:HamburgerMenuItemCollection>
-            </mah:HamburgerMenu.ItemsSource>
+                        </Controls:HamburgerMenuGlyphItem.Tag>
+                    </Controls:HamburgerMenuGlyphItem>
+                </Controls:HamburgerMenuItemCollection>
+            </Controls:HamburgerMenu.ItemsSource>
 
             <!--  Options  -->
-            <mah:HamburgerMenu.OptionsItemsSource>
-                <mah:HamburgerMenuItemCollection>
-                    <mah:HamburgerMenuIconItem Label="  关于">
-                        <mah:HamburgerMenuIconItem.Icon>
+            <Controls:HamburgerMenu.OptionsItemsSource>
+                <Controls:HamburgerMenuItemCollection>
+                    <Controls:HamburgerMenuIconItem Label="  关于">
+                        <Controls:HamburgerMenuIconItem.Icon>
                             <iconPacks:PackIconFontAwesome Width="22"
                                         Height="22"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Kind="QuestionCircleRegular" />
-                        </mah:HamburgerMenuIconItem.Icon>
-                        <mah:HamburgerMenuIconItem.Tag>
+                        </Controls:HamburgerMenuIconItem.Icon>
+                        <Controls:HamburgerMenuIconItem.Tag>
                             <Grid>
                                 <TextBlock
                                 FontSize="20"
                                 FontWeight="Bold"
-                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,30,0,0">
-									基础使用指南
-                                </TextBlock>
+                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,30,0,0"><Run Text="基础使用指南"/></TextBlock>
                                 <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,80,0,0"
                                 FontSize="15" FontWeight="Bold"
                    Text="1 将准备好版本的 .minecraft 文件夹置于本程序根目录下"/>
@@ -265,35 +263,33 @@
                                 FontSize="15" FontWeight="Bold"
                    Text="FriendShip Studio © 2021 | HarbourLauncher EA 75"/>
                             </Grid>
-                        </mah:HamburgerMenuIconItem.Tag>
-                    </mah:HamburgerMenuIconItem>
+                        </Controls:HamburgerMenuIconItem.Tag>
+                    </Controls:HamburgerMenuIconItem>
 
-                </mah:HamburgerMenuItemCollection>
-            </mah:HamburgerMenu.OptionsItemsSource>
+                </Controls:HamburgerMenuItemCollection>
+            </Controls:HamburgerMenu.OptionsItemsSource>
             <!--  Content  -->
-            <mah:HamburgerMenu.ContentTemplate>
+            <Controls:HamburgerMenu.ContentTemplate>
                 <DataTemplate>
                     <Grid x:Name="ContentGrid">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <mah:TransitioningContentControl Grid.Row="1"
-                                                Content="{Binding Tag,Mode=OneWay}"
+                        <Controls:TransitioningContentControl Grid.Row="1"
+                                                Content="{Binding Tag, Mode=OneWay}"
                                                 RestartTransitionOnContentChange="True"
-                                                Transition="Right">
-
-                        </mah:TransitioningContentControl>
+                                                Transition="Right"/>
                     </Grid>
                 </DataTemplate>
-            </mah:HamburgerMenu.ContentTemplate>
-        </mah:HamburgerMenu>
+            </Controls:HamburgerMenu.ContentTemplate>
+        </Controls:HamburgerMenu>
 
-        <mah:FlyoutsControl>
-            <mah:Flyout x:Name="MicrosoftSettingsFlyout" Header="微软登录设置" Position="Right" Width="300">
+        <Controls:FlyoutsControl>
+            <Controls:Flyout x:Name="MicrosoftSettingsFlyout" Header="微软登录设置" Position="Right" Width="300">
                 <Grid>
                     <TextBlock Text="快速登录" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,15,0,0" Width="80" Height="25" FontSize="18"/>
-                    <mah:ToggleSwitch  x:Name="IsLocalAccount" OffContent="停用" OnContent="启用" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,10,40,0" FontSize="18" FontFamily="Microsoft YaHei UI" Height="30" MinWidth="0" />
+                    <Controls:ToggleSwitch  x:Name="IsLocalAccount" OffContent="停用" OnContent="启用" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,10,40,0" FontSize="18" FontFamily="Microsoft YaHei UI" Height="30" MinWidth="0" />
                     <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,50,0,0"
                                 FontSize="13" Foreground="Gray"
                                 Text="*：启用此项则使用已登录的微软账户登录"/>
@@ -307,8 +303,8 @@
                                                         Kind="SignInAltSolid"/>
                     </Controls:Tile>
                 </Grid>
-            </mah:Flyout>
-        </mah:FlyoutsControl>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
     </Grid>
 
 
