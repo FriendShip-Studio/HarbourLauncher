@@ -261,7 +261,7 @@
                    Text="*：微软登录用户取消不认为是故障"/>
                                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20"
                                 FontSize="15" FontWeight="Bold"
-                   Text="FriendShip Studio © 2021 | HarbourLauncher EA 75"/>
+                   Text="FriendShip Studio © 2021 | HarbourLauncher EA 76"/>
                             </Grid>
                         </Controls:HamburgerMenuIconItem.Tag>
                     </Controls:HamburgerMenuIconItem>

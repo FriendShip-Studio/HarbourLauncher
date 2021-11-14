@@ -98,13 +98,13 @@ namespace HarbourLauncher
             MinecraftListGet();
             try
             {
-                if (JavaCombo.Items.Count != 0)
+                if (tools.GetJavaPath().Count() != 0)
                     JavaCombo.ItemsSource = tools.GetJavaPath();
                 JavaCombo.SelectedItem = JavaCombo.Items[0];
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message, "初始化错误");
+                MessageBox.Show(e.Message, "初始化错误");
             }
 
             try
@@ -115,13 +115,14 @@ namespace HarbourLauncher
                     IndexverCombo.ItemsSource = tools.GetAllTheExistingVersion();
                 }
                 if (verCombo.Items.Count != 0)
+                {
                     verCombo.SelectedItem = verCombo.Items[0];
-                if (IndexverCombo.Items.Count != 0)
-                    IndexverCombo.SelectedItem = verCombo.Items[0];
+                    IndexverCombo.SelectedItem = verCombo.SelectedItem;
+                }
             }
             catch (Exception e)
             {
-                //MessageBox.Show(e.Message, "初始化错误");
+                MessageBox.Show(e.Message, "初始化错误");
             }
         }
         /// <summary>
@@ -150,11 +151,11 @@ namespace HarbourLauncher
                     //    {
                     //        if(i.type == "正式版")
                     //        {
-                                
+
                     //            mcVer.Append(i);   
                     //        }
                     //    }
-                        
+
                     //}
                     //else if(versionEnum == VersionEnum.release)
                     //{
@@ -165,7 +166,7 @@ namespace HarbourLauncher
                     //            mcVer.Append(i);
                     //        }
                     //    }
-                        
+
                     //}
                     //else if (versionEnum == VersionEnum.all)
                     //{
@@ -173,8 +174,8 @@ namespace HarbourLauncher
                     //}
                     //mcVersionList = mcVer;
                     #endregion
-                    this.Dispatcher.Invoke(() => { mcVersionDataGrid.ItemsSource = mcVersionList; });
-                    
+                    Dispatcher.Invoke(() => { mcVersionDataGrid.ItemsSource = mcVersionList; });
+
                 });
                 #endregion
             }
@@ -228,7 +229,7 @@ namespace HarbourLauncher
                         else if (loginMode == LoginMode.Microsoft)
                         {
                             StartGame.Title = "正在启动";
-                            Game game = new Game();//声明对象
+                            Game game = new();//声明对象
                             await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), name, uuid, Minecraft_Token, "", "");
                             game.ErrorEvent += Game_ErrorEvent;
                             game.LogEvent += Game_LogEvent;
@@ -284,28 +285,26 @@ namespace HarbourLauncher
         public void MicrosoftLogin()
         {
             loginMode = LoginMode.Microsoft;
-            bool auto = false;//true是登录电脑设置里的微软账户，false是登录其他账户
-            MicrosoftLogin microsoftLogin = new MicrosoftLogin();
-            Xbox XboxLogin = new Xbox();
+            bool auto = false;
+            if (IsLocalAccount.IsOn)
+            {
+                auto = true;    //true是登录电脑设置里的微软账户，false是登录其他账户
+            }
+            MicrosoftLogin microsoftLogin = new();
+            Xbox XboxLogin = new();
             try
             {
                 Minecraft_Token = new MinecraftLogin().GetToken(XboxLogin.XSTSLogin(XboxLogin.GetToken(microsoftLogin.GetToken(microsoftLogin.Login(auto)).access_token)));
+                MicrosoftLoginStat.Text = "微软登录成功";
             }
             catch (Exception Err)
             {
-                if (Err.Message == "用户取消登录")
-                {
-
-                    MessageBox.Show("您取消了登录，因此登录未完成", "微软登录");
-                }
-                else
-                {
-                    MessageBox.Show("我们遇到了一个预料之外的问题，因此登录未完成", "微软登录");
-                }
+                MessageBox.Show(Err.Message, "微软登录错误");
                 loginMode = LoginMode.Online;
+                return;
             }
 
-            MinecraftLogin minecraftlogin = new MinecraftLogin();
+            MinecraftLogin minecraftlogin = new();
             MinecraftLoginToken Minecraft = minecraftlogin.GetMincraftuuid(Minecraft_Token);
             uuid = Minecraft.uuid;
             name = Minecraft.name;
@@ -313,7 +312,7 @@ namespace HarbourLauncher
         //正版
         public async void MojangLogin()
         {
-            Game game = new Game();//声明对象
+            Game game = new();//声明对象
             await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), MojangAccount.Text.Trim(), MojangPassword.Password.Trim());
             game.ErrorEvent += Game_ErrorEvent;
             game.LogEvent += Game_LogEvent;
