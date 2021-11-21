@@ -1,27 +1,22 @@
-﻿using System;
+﻿using Gac;
+using MahApps.Metro.Controls;
+using SquareMinecraftLauncher.Core.OAuth;
+using SquareMinecraftLauncher.Minecraft;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MahApps.Metro.Controls;
-using SquareMinecraftLauncher.Minecraft;
-using SquareMinecraftLauncher.Core;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using SquareMinecraftLauncher.Core.OAuth;
-using System.Threading;
-using Gac;
-using System.IO;
 
 namespace HarbourLauncher
 {
@@ -31,9 +26,13 @@ namespace HarbourLauncher
 
     public partial class MainWindow : MetroWindow
     {
-        Tools tools = new Tools();//
+
+        
+        private Tools tools = new Tools();//
         public Dictionary<string, string> javaList = new();
+
         #region 启动模式枚举
+
         /// <summary>
         /// 启动模式枚举
         /// </summary>
@@ -43,51 +42,69 @@ namespace HarbourLauncher
             /// 离线
             /// </summary>
             Offline,
+
             /// <summary>
             /// mojang登录
             /// </summary>
             Online,
+
             /// <summary>
             /// 微软登录
             /// </summary>
             Microsoft,
         }
+
         public LoginMode loginMode = new();
-        #endregion
+
+        #endregion 启动模式枚举
+
         #region 启动参数
+
         public string Minecraft_Token;
         public string uuid;
         public string name;
         public bool Online = false;
-        #endregion
+
+        #endregion 启动参数
+
         #region log and error
-        StreamWriter streamWriter1 = new(@"error.txt");
-        StreamWriter streamWriter = new(@"log.txt");
-        #endregion
-        SquareMinecraftLauncher.MinecraftDownload minecraftDownload = new();
-        Gac.DownLoadFile downLoadFile = new Gac.DownLoadFile();
-        ImageBrush redstone_lamp = new ImageBrush() { ImageSource = new BitmapImage(new Uri(@"Assets/redstone_lamp.png", UriKind.RelativeOrAbsolute)) };
-        ImageBrush redstone_lamp_on = new ImageBrush() { ImageSource = new BitmapImage(new Uri(@"Assets/redstone_lamp_on.png", UriKind.RelativeOrAbsolute)) };
+
+        private StreamWriter streamWriter1 = new(@"error.txt");
+        private StreamWriter streamWriter = new(@"log.txt");
+
+        #endregion log and error
+
+        private SquareMinecraftLauncher.MinecraftDownload minecraftDownload = new();
+        private Gac.DownLoadFile downLoadFile = new Gac.DownLoadFile();
+        private ImageBrush redstone_lamp = new ImageBrush() { ImageSource = new BitmapImage(new Uri(@"Assets/redstone_lamp.png", UriKind.RelativeOrAbsolute)) };
+        private ImageBrush redstone_lamp_on = new ImageBrush() { ImageSource = new BitmapImage(new Uri(@"Assets/redstone_lamp_on.png", UriKind.RelativeOrAbsolute)) };
         public MCVersionList[] mcVersionList = new MCVersionList[1].ToArray();
-        int tryCount = 0;
+        private int tryCount = 0;
+        GacDownloader gac1 = new GacDownloader(36);
+
         #region 版本枚举
+
         public enum VersionEnum
         {
             /// <summary>
             /// 快照版
             /// </summary>
             alpha,
+
             /// <summary>
             /// 正式版
             /// </summary>
             release,
+
             /// <summary>
             /// 所有版本
             /// </summary>
             all
         }
-        VersionEnum versionEnum = new();
-        #endregion
+
+        private VersionEnum versionEnum = new();
+
+        #endregion 版本枚举
 
         public MainWindow()
         {
@@ -95,11 +112,19 @@ namespace HarbourLauncher
             ServicePointManager.DefaultConnectionLimit = 512;
             Initialize();
         }
+
         /// <summary>
         /// 初始化
         /// </summary>
         public void Initialize()
         {
+
+            Binding binding = new Binding();//创建Binding实例
+            binding.Source = gac1;//指定数据源
+            binding.Path = new PropertyPath("downloadPercent");//指定访问路径 
+            binding.Mode = BindingMode.OneWay;
+            downloadper.SetBinding(ProgressBar.ValueProperty, binding);
+
             versionEnum = VersionEnum.release;
             tools.DownloadSourceInitialization(DownloadSource.bmclapiSource);
             MinecraftListGet();
@@ -132,6 +157,7 @@ namespace HarbourLauncher
                 MessageBox.Show(e.Message, "初始化错误");
             }
         }
+
         /// <summary>
         /// 获取所有java
         /// </summary>
@@ -141,6 +167,7 @@ namespace HarbourLauncher
             //未完成
             return null;
         }
+
         /// <summary>
         /// 获取我的世界版本列表
         /// </summary>
@@ -149,47 +176,50 @@ namespace HarbourLauncher
             try
             {
                 #region 获取下载版本列表
-                await tools.GetMCVersionList();
-                await tools.GetMCVersionList().ContinueWith(x =>
-                {
-                    mcVersionList = tools.GetMCVersionList().Result;
-                    //MCVersionList[] mcVer = new MCVersionList[tools.GetMCVersionList().Result.Count()];
-                    #region 筛选
-                    //if (versionEnum == VersionEnum.release)
-                    //{
-                    //    foreach(var i in mcVersionList)
-                    //    {
-                    //        if(i.type == "正式版")
-                    //        {
 
-                    //            mcVer.Append(i);   
-                    //        }
-                    //    }
+                var v = await tools.GetMCVersionList();
 
-                    //}
-                    //else if(versionEnum == VersionEnum.release)
-                    //{
-                    //    foreach(var i in mcVersionList)
-                    //    {
-                    //        if(i.type == "快照版")
-                    //        {
-                    //            mcVer.Append(i);
-                    //        }
-                    //    }
 
-                    //}
-                    //else if (versionEnum == VersionEnum.all)
-                    //{
-                    //    mcVer = mcVersionList;
-                    //}
-                    //mcVersionList = mcVer;
-                    #endregion
-                    Dispatcher.Invoke(() => { mcVersionDataGrid.ItemsSource = mcVersionList; });
+                //MCVersionList[] mcVer = new MCVersionList[tools.GetMCVersionList().Result.Count()];
 
-                });
-                #endregion
+                #region 筛选
+
+                //if (versionEnum == VersionEnum.release)
+                //{
+                //    foreach(var i in mcVersionList)
+                //    {
+                //        if(i.type == "正式版")
+                //        {
+                //            mcVer.Append(i);
+                //        }
+                //    }
+
+                //}
+                //else if(versionEnum == VersionEnum.release)
+                //{
+                //    foreach(var i in mcVersionList)
+                //    {
+                //        if(i.type == "快照版")
+                //        {
+                //            mcVer.Append(i);
+                //        }
+                //    }
+
+                //}
+                //else if (versionEnum == VersionEnum.all)
+                //{
+                //    mcVer = mcVersionList;
+                //}
+                //mcVersionList = mcVer;
+
+                #endregion 筛选
+
+                mcVersionDataGrid.ItemsSource = v;
+
+
+                #endregion 获取下载版本列表
             }
-            catch 
+            catch
             {
                 tryCount++;
                 if (tryCount < 5)
@@ -200,9 +230,7 @@ namespace HarbourLauncher
                 {
                     MessageBox.Show("获取版本列表错误");
                 }
-
             }
-
         }
 
         private void Support(object sender, RoutedEventArgs e)
@@ -220,46 +248,72 @@ namespace HarbourLauncher
                 // this.HamburgerMenuControl.SetCurrentValue(HamburgerMenuControl.IsPaneOpenProperty, false);
             }
         }
+
         //启动
         private async void StartGame_Click(object sender, RoutedEventArgs e)
         {
+
             if (StartGame.Title == "启动游戏")
             {
+
                 try
                 {
-                    StartGame.Title = "正在补全文件";
-                    FileComplete();
-                    if (tools.GetMissingFile(verCombo.Text).Count() != 0)
+                    streamWriter.WriteLine("");
+                    streamWriter1.WriteLine("");
+
+                    if (tools.GetMissingAsset(verCombo.Text).Count() != 0 || tools.GetMissingFile(verCombo.Text).Count() != 0)
                     {
-                        MessageBox.Show("文件补全失败");
+                        StartGame.Title = "正在补全文件";
+                        FileComplete();
                     }
-                    if (JavaCombo.Text != string.Empty && verCombo.Text != string.Empty)
-                        if (loginMode == LoginMode.Offline && playerName.Text != string.Empty)
-                        {
-                            StartGame.Title = "正在启动";
-                            OfflineLogin();
-                        }
-                        else if (loginMode == LoginMode.Microsoft)
-                        {
-                            StartGame.Title = "正在启动";
-                            Game game = new();//声明对象
-                            await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), name, uuid, Minecraft_Token, "", "");
-                            game.ErrorEvent += Game_ErrorEvent;
-                            game.LogEvent += Game_LogEvent;
-                        }
-                        else if (loginMode == LoginMode.Online)
-                        {
-                            StartGame.Title = "正在启动";
-                            MojangLogin();
-                        }
-                        else
-                        {
-                            MessageBox.Show("请输入玩家名称", "离线登录");
-                        }
-                    else
+                    
+                    await Task.Run(() =>
                     {
-                        MessageBox.Show("环境配置错误", "启动失败");
-                    }
+                        while (gac1.GetEndDownload() != true || gac1.GetEndDownload() != true)
+                        {
+                            Thread.Sleep(1000);
+                        }
+                        Dispatcher.Invoke(() => {
+                            if (tools.GetMissingFile(verCombo.Text).Count() != 0||tools.GetMissingAsset(verCombo.Text).Count()!=0)
+                            {
+                                MessageBox.Show("文件补全失败");
+                            }
+                            else
+                            {
+                                if (JavaCombo.Text != string.Empty && verCombo.Text != string.Empty)
+                                    if (loginMode == LoginMode.Offline && playerName.Text != string.Empty)
+                                    {
+                                        StartGame.Title = "正在启动";
+                                        OfflineLogin();
+                                    }
+                                    else if (loginMode == LoginMode.Microsoft)
+                                    {
+                                        StartGame.Title = "正在启动";
+                                        MicrosoftL();
+
+                                    }
+                                    else if (loginMode == LoginMode.Online)
+                                    {
+                                        StartGame.Title = "正在启动";
+                                        MojangLogin();
+
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("请输入玩家名称", "离线登录");
+                                    }
+                                else
+                                {
+                                    MessageBox.Show("环境配置错误", "启动失败");
+                                }
+                            }
+
+                           
+                        });
+                        
+                    });
+
+                    
                 }
                 catch (Exception err)
                 {
@@ -273,33 +327,44 @@ namespace HarbourLauncher
 
 
 
+
         }
+
         #region 游戏事件
+
         /// <summary>
         /// 日志事件
         /// </summary>
         /// <param name="Log"></param>
         private void Game_LogEvent(Game.Log Log)
         {
-            
             streamWriter.WriteLine(Log.Message);
             //MessageBox.Show("日志");
             //MessageBox.Show(Log.Message);
         }
+
         /// <summary>
         /// 崩溃事件
         /// </summary>
         /// <param name="error"></param>
         private void Game_ErrorEvent(Game.Error error)
         {
-            
             streamWriter1.WriteLine(error.Message);
             //MessageBox.Show("错误");
             //MessageBox.Show(error.Message);
             //MessageBox.Show(error.SeriousError);
         }
-        #endregion
+
+        #endregion 游戏事件
+
         #region 登录
+        public async void MicrosoftL()
+        {
+            Game game = new();//声明对象
+            await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), name, uuid, Minecraft_Token, "", "");
+            game.ErrorEvent += Game_ErrorEvent;
+            game.LogEvent += Game_LogEvent;
+        }
         //微软
         public void MicrosoftLogin()
         {
@@ -328,7 +393,7 @@ namespace HarbourLauncher
             uuid = Minecraft.uuid;
             name = Minecraft.name;
         }
-        
+
         //正版
         public async void MojangLogin()
         {
@@ -337,6 +402,7 @@ namespace HarbourLauncher
             game.ErrorEvent += Game_ErrorEvent;
             game.LogEvent += Game_LogEvent;
         }
+
         //离线
         public async void OfflineLogin()
         {
@@ -345,7 +411,9 @@ namespace HarbourLauncher
             game.ErrorEvent += Game_ErrorEvent;
             game.LogEvent += Game_LogEvent;
         }
-        #endregion
+
+        #endregion 登录
+
         private void MaxMem_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex re = new Regex("[^0-9]+");
@@ -386,17 +454,25 @@ namespace HarbourLauncher
         {
             MicrosoftLogin();
         }
+
         public void FileComplete()
         {
-            
             var v2 = tools.GetMissingFile(verCombo.Text);
             var v3 = tools.GetMissingAsset(verCombo.Text);
-            GacDownloader gacDownloader = new(3,v2);
-            GacDownloader gacDownloader1 = new(3,v3);
-            gacDownloader.StartDownload();
-            gacDownloader1.StartDownload();
-        }
+            List<MCDownload> md = new List<MCDownload>();
+            foreach (var v in v2)
+            {
+                md.Add(v);
+            }
+            foreach (var v in v3)
+            {
+                md.Add(v);
+            }
+            gac1.AddDownload(md.ToArray());
+            gac1.StartDownload();
 
+
+        }
 
         /// <summary>
         /// 游戏文件下载bmclapi
@@ -419,17 +495,20 @@ namespace HarbourLauncher
             tools.DownloadSourceInitialization(DownloadSource.bmclapiSource);
             var v = minecraftDownload.MCjarDownload(((MCVersionList)mcVersionDataGrid.SelectedItem).id);
             var v1 = minecraftDownload.MCjsonDownload(((MCVersionList)mcVersionDataGrid.SelectedItem).id);
-            Download(v.path,v.Url);
-            Download(v1.path,v1.Url);
+            gac1.AddDownload(new MCDownload[] { v, v1 });
+            gac1.StartDownload();
         }
+
         /// <summary>
         /// 多线程下载
         /// </summary>
         public class GacDownloader
         {
-            Thread[] Threads = new Thread[0];
-            SquareMinecraftLauncher.Minecraft.MCDownload[] download = new SquareMinecraftLauncher.Minecraft.MCDownload[0];
-            int EndDownload = 0;
+            public float downloadPercent { internal set; get; } = 100;
+            private Thread[] Threads = new Thread[0];
+            private MCDownload[] download = new MCDownload[0];
+            private int EndDownload = 0;
+
             public GacDownloader(int thread, SquareMinecraftLauncher.Minecraft.MCDownload[] download)
             {
                 Threads = new Thread[thread];
@@ -441,9 +520,17 @@ namespace HarbourLauncher
                 Threads = new Thread[3];
                 this.download = download;
             }
+            public GacDownloader(int thread)
+            {
+                Threads = new Thread[thread];
+            }
+            public void AddDownload(MCDownload[] download)
+            {
+                this.download = download;
+            }
+            private int ADindex = 0;
 
-            int ADindex = 0;
-            private SquareMinecraftLauncher.Minecraft.MCDownload AssignedDownload()
+            private MCDownload AssignedDownload()
             {
                 if (ADindex == download.Length) return null;
                 ADindex++;
@@ -458,7 +545,7 @@ namespace HarbourLauncher
                     Threads[i].IsBackground = true;
                     Threads[i].Start();//启动线程
                 }
-                MessageBox.Show("下载完成");
+                
             }
 
             private async void DownloadProgress()
@@ -466,22 +553,25 @@ namespace HarbourLauncher
                 List<FileDownloader> files = new List<FileDownloader>();
                 for (int i = 0; i < 3; i++)
                 {
-                    SquareMinecraftLauncher.Minecraft.MCDownload download = AssignedDownload();//分配下载任务
+                    MCDownload download = AssignedDownload();//分配下载任务
                     try
                     {
                         if (download != null)
                         {
-                            FileDownloader fileDownloader = new FileDownloader(download.Url, download.path.Replace(System.IO.Path.GetFileName(download.path), ""), System.IO.Path.GetFileName(download.path));//增加下载
+                            
+                            FileDownloader fileDownloader = new FileDownloader(download.Url, download.path.Replace(Path.GetFileName(download.path), ""), Path.GetFileName(download.path));//增加下载
+                            //if (files.Count != 0)
+                            //    downloadPercent = end / files.Count;
                             fileDownloader.download(null);
                             files.Add(fileDownloader);
+                            
                         }
                     }
                     catch (Exception ex)//当出现下载失败时，忽略该文件
                     {
-                        Console.WriteLine(ex.Message);
+                        MessageBox.Show("下载失败"+ex.Message);
                     }
                 }
-                if (files.Count == 0) return;
                 await Task.Factory.StartNew(() =>
                 {
                     while (true)//循环检测当前线程files.Count个下载任务是否下载完毕
@@ -492,6 +582,9 @@ namespace HarbourLauncher
                             if (files[i].download(null) == files[i].getFileSize())
                             {
                                 end++;
+                                if (files.Count != 0)
+                                    downloadPercent = end / files.Count * 100;
+                                
                             }
                         }
                         Console.WriteLine(EndDownload);
@@ -499,12 +592,16 @@ namespace HarbourLauncher
                         if (end == files.Count)//完成则递归当前函数
                         {
                             EndDownload += files.Count;
+                            if (files.Count != 0)
+                                downloadPercent = end / files.Count *100;
                             DownloadProgress();//递归
                             return;
                         }
                         Thread.Sleep(1000);
                     }
                 });
+                if (files.Count == 0) return;
+                
             }
 
             public bool GetEndDownload()
@@ -513,21 +610,6 @@ namespace HarbourLauncher
             }
         }
 
-        private void DownLoadFile_doSendMsg(Gac.DownMsg msg)
-        {
-            switch (msg.Tag)
-            {
-                //case Gac.DownStatus.Start:
-                //    MessageBox.Show("开始");
-                //    break;
-                //case Gac.DownStatus.Error:
-                //    MessageBox.Show("错误");
-                //    break;
-                case Gac.DownStatus.End:
-                    MessageBox.Show("完成");
-                    break;
-            }
-        }
 
         /// <summary>
         /// 重新找版本
@@ -542,21 +624,11 @@ namespace HarbourLauncher
                 IndexverCombo.ItemsSource = tools.GetAllTheExistingVersion();
             }
         }
+
         private void MicrosoftSettings_Click(object sender, RoutedEventArgs e)
         {
             MicrosoftSettingsFlyout.IsOpen = true;
         }
-        //ly来源，path保存路径，url下载地址
-        public static int id = 0;
-        internal int Download(string path, string url)
-        {
-            downLoadFile.AddDown(url, path.Replace(System.IO.Path.GetFileName(path), ""), System.IO.Path.GetFileName(path), id);//增加下载
-            downLoadFile.StartDown(36);//开始下载
-            downLoadFile.doSendMsg += DownLoadFile_doSendMsg;
-            id++;
-            return id - 1;
-        }
+
     }
-
 }
-
