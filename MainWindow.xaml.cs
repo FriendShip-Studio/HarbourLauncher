@@ -245,7 +245,7 @@ namespace HarbourLauncher
 
             if (!e.IsItemOptions && this.HamburgerMenuControl.IsPaneOpen)
             {
-                // You can close the menu if an item was selected
+                // You can close the menu if an item was selectedd
                 // this.HamburgerMenuControl.SetCurrentValue(HamburgerMenuControl.IsPaneOpenProperty, false);
             }
         }
