@@ -112,8 +112,6 @@ namespace HarbourLauncher
             ServicePointManager.DefaultConnectionLimit = 512;
             Initialize();
         }
-        
-
         /// <summary>
         /// 初始化
         /// </summary>
@@ -259,62 +257,39 @@ namespace HarbourLauncher
 
                 try
                 {
-                    streamWriter.WriteLine("");
-                    streamWriter1.WriteLine("");
-
+                    StartGame.Title = "正在补全文件";
+                    FileComplete();
                     if (tools.GetMissingFile(verCombo.Text).Count() != 0)
                     {
-                        StartGame.Title = "正在补全文件";
-                        FileComplete();
+                        MessageBox.Show("文件补全失败");
                     }
-                    
-                    await Task.Run(() =>
-                    {
-                        while (gac1.GetEndDownload() != true || gac1.GetEndDownload() != true)
+                    if (JavaCombo.Text != string.Empty && verCombo.Text != string.Empty)
+                        if (loginMode == LoginMode.Offline && playerName.Text != string.Empty)
                         {
-                            Thread.Sleep(1000);
+                            StartGame.Title = "正在启动";
+                            OfflineLogin();
                         }
-                        Dispatcher.Invoke(() => {
-                            if (tools.GetMissingFile(verCombo.Text).Count() != 0)
-                            {
-                                MessageBox.Show("文件补全失败");
-                            }
-                            else
-                            {
-                                if (JavaCombo.Text != string.Empty && verCombo.Text != string.Empty)
-                                    if (loginMode == LoginMode.Offline && playerName.Text != string.Empty)
-                                    {
-                                        StartGame.Title = "正在启动";
-                                        OfflineLogin();
-                                    }
-                                    else if (loginMode == LoginMode.Microsoft)
-                                    {
-                                        StartGame.Title = "正在启动";
-                                        MicrosoftL();
-
-                                    }
-                                    else if (loginMode == LoginMode.Online)
-                                    {
-                                        StartGame.Title = "正在启动";
-                                        MojangLogin();
-
-                                    }
-                                    else
-                                    {
-                                        MessageBox.Show("请输入玩家名称", "离线登录");
-                                    }
-                                else
-                                {
-                                    MessageBox.Show("环境配置错误", "启动失败");
-                                }
-                            }
-
-                           
-                        });
-                        
-                    });
-
-                    
+                        else if (loginMode == LoginMode.Microsoft)
+                        {
+                            StartGame.Title = "正在启动";
+                            Game game = new();//声明对象
+                            await game.StartGame(verCombo.Text, JavaCombo.SelectedValue.ToString(), int.Parse(maxMem.Text.Trim()), name, uuid, Minecraft_Token, "", "");
+                            game.ErrorEvent += Game_ErrorEvent;
+                            game.LogEvent += Game_LogEvent;
+                        }
+                        else if (loginMode == LoginMode.Online)
+                        {
+                            StartGame.Title = "正在启动";
+                            MojangLogin();
+                        }
+                        else
+                        {
+                            MessageBox.Show("请输入玩家名称", "离线登录");
+                        }
+                    else
+                    {
+                        MessageBox.Show("环境配置错误", "启动失败");
+                    }
                 }
                 catch (Exception err)
                 {
@@ -459,14 +434,12 @@ namespace HarbourLauncher
         public void FileComplete()
         {
             var v2 = tools.GetMissingFile(verCombo.Text);
-            List<MCDownload> md = new List<MCDownload>();
-            foreach (var v in v2)
-            {
-                md.Add(v);
-            }
-            gac1.AddDownload(md.ToArray());
-            gac1.StartDownload();
-
+            var v3 = tools.GetMissingAsset(verCombo.Text);
+            GacDownloader gacDownloader = new(3,v2);
+            GacDownloader gacDownloader1 = new(3,v3);
+            gacDownloader.StartDownload();
+            gacDownloader1.StartDownload();
+        }
 
         }
 
@@ -547,6 +520,24 @@ namespace HarbourLauncher
             private async void DownloadProgress()
             {
                 List<FileDownloader> files = new List<FileDownloader>();
+                for (int i = 0; i < 3; i++)
+                {
+                    SquareMinecraftLauncher.Minecraft.MCDownload download = AssignedDownload();//分配下载任务
+                    try
+                    {
+                        if (download != null)
+                        {
+                            FileDownloader fileDownloader = new FileDownloader(download.Url, download.path.Replace(System.IO.Path.GetFileName(download.path), ""), System.IO.Path.GetFileName(download.path));//增加下载
+                            fileDownloader.download(null);
+                            files.Add(fileDownloader);
+                        }
+                    }
+                    catch (Exception ex)//当出现下载失败时，忽略该文件
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+                if (files.Count == 0) return;
                 await Task.Factory.StartNew(() =>
                 {
                     while (true)//循环检测当前线程files.Count个下载任务是否下载完毕
@@ -557,9 +548,6 @@ namespace HarbourLauncher
                             if (files[i].download(null) == files[i].getFileSize())
                             {
                                 end++;
-                                if (files.Count != 0)
-                                    downloadPercent = end / files.Count * 100;
-
                             }
                         }
                         Console.WriteLine(EndDownload);
@@ -568,43 +556,12 @@ namespace HarbourLauncher
                         {
 
                             EndDownload += files.Count;
-                            if (files.Count != 0)
-                                downloadPercent = end / files.Count * 100;
-                            foreach (var i in Threads)
-                            {
-                                if(i != null)
-                                    i.Abort();
-                            }
                             DownloadProgress();//递归
                             return;
                         }
                         Thread.Sleep(1000);
                     }
                 });
-                for (int i = 0; i < 3; i++)
-                {
-                    MCDownload download = AssignedDownload();//分配下载任务
-                    try
-                    {
-                        if (download != null)
-                        {
-                            
-                            FileDownloader fileDownloader = new FileDownloader(download.Url, download.path.Replace(Path.GetFileName(download.path), ""), Path.GetFileName(download.path));//增加下载
-                            //if (files.Count != 0)
-                            //    downloadPercent = end / files.Count;
-                            fileDownloader.download(null);
-                            files.Add(fileDownloader);
-                            
-                        }
-                    }
-                    catch (Exception ex)//当出现下载失败时，忽略该文件
-                    {
-                        MessageBox.Show("下载失败"+ex.Message);
-                    }
-                }
-                
-                if (files.Count == 0) return;
-                
             }
 
             public bool GetEndDownload()
@@ -620,14 +577,6 @@ namespace HarbourLauncher
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            if (tools.GetAllTheExistingVersion().Count() != 0)
-            {
-                verCombo.ItemsSource = tools.GetAllTheExistingVersion();
-                IndexverCombo.ItemsSource = tools.GetAllTheExistingVersion();
-            }
-        }
-        public void FindVersion()
         {
             if (tools.GetAllTheExistingVersion().Count() != 0)
             {

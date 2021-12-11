@@ -119,12 +119,8 @@
                             <Grid>
                                 <TextBlock Text="启动版本" TextWrapping="Wrap" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,150,190" Width="80" Height="30" FontSize="18" />
                                 <ComboBox x:Name="IndexverCombo" DisplayMemberPath="version" Width="200" Height="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" MaxDropDownHeight="300" Margin="0,0,30,160"
-                                          SelectionChanged="IndexverCombo_SelectionChanged" />
-                                <!--测试用-->
-                                <Button Height="30" Width="100" HorizontalAlignment="Right" Click="Button_Click_2" ></Button>
-                                <ProgressBar Height="30" Width="200" x:Name="downloadper"></ProgressBar>
-                                <!--测试-->
-                                <Controls:Tile Title="启动游戏"
+                                          SelectionChanged="IndexverCombo_SelectionChanged"/>
+                                <Controls:Tile Title="启动游戏" 
                                 x:Name="StartGame"
                                 Margin="0,0,30,30"
                                 Controls:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
