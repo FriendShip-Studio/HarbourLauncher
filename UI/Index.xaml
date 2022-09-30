@@ -1,0 +1,141 @@
+﻿<Page x:Class="HarbourLauncher_Reloaded.UI.Index"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+      xmlns:iconPacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome" 
+      xmlns:converters="clr-namespace:MahApps.Metro.IconPacks.Converter;assembly=MahApps.Metro.IconPacks.Core"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:HarbourLauncher_Reloaded.UI"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Index">
+
+    <Grid>
+        <mah:FlipView x:Name="IndexFlips"
+              Height="151"
+              Width="504"
+              Margin="50 50 0 0"
+              Foreground="{DynamicResource MahApps.Brushes.ThemeBackground}"
+              SelectionChanged="FlipView_SelectionChanged" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.9">
+            <mah:FlipView.Items>
+                <Grid>
+                    <Grid.Background>
+                        <ImageBrush ImageSource="/images/flips1.png"></ImageBrush>
+                    </Grid.Background>
+                </Grid>
+                <Grid>
+                    <Grid.Background>
+                        <ImageBrush ImageSource="/images/flips2.png"></ImageBrush>
+                    </Grid.Background>
+                </Grid>
+                <Grid>
+                    <Grid.Background>
+                        <ImageBrush ImageSource="/images/flips3.png"></ImageBrush>
+                    </Grid.Background>
+                </Grid>
+            </mah:FlipView.Items>
+        </mah:FlipView>
+
+
+        <mah:FlyoutsControl Panel.ZIndex="10">
+            <mah:Flyout x:Name="GameSettingsFlyOuts" Header="启动设置" Position="Right" Width="800" IsOpen="{Binding IsAboutFlyoutOpen}">
+                <Grid>
+                    <TextBlock Text="Java环境" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,3,0,0" Width="80" Height="30" FontSize="18"/>
+                    <ComboBox x:Name="JavaCombo" Width="400" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" MaxDropDownHeight="300" Margin="110,0,0,0"/>
+                    <Button x:Name="JavaRefresh" FontSize="12"
+                            Content="重新搜索" Width="100" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="410,40,0,20" Click="JavaRefresh_Click" Style="{DynamicResource MahApps.Styles.Button.Square}"/>
+                    <TextBlock Text="启动版本" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,83,0,0" Width="80" Height="30" FontSize="18"/>
+                    <ComboBox x:Name="verCombo" Width="200" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" MaxDropDownHeight="300" Margin="110,80,0,0" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+                    <TextBlock Text="启动内存" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,123,0,0" Width="80" Height="30" FontSize="18"/>
+                    <TextBox x:Name="maxMem" Text="1024" TextWrapping="Wrap"  HorizontalAlignment="Left" IsReadOnly="False"
+                             VerticalAlignment="Top" Width="160" Height="30" FontSize="15" Margin="110,120,0,0" InputMethod.IsInputMethodEnabled="False" PreviewTextInput="MaxMem_PreviewTextInput" />
+                    <TextBlock Text="MB" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="280,123,0,0" Width="30" Height="30" FontSize="18"/>
+
+                    <TextBlock Text="正版验证" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,165,0,0" Width="80" Height="25" FontSize="18"/>
+                    <Controls:ToggleSwitch  x:Name="IsAuth" OffContent="    停用" OnContent="    启用" Toggled="IsAuth_Toggled" VerticalAlignment="Top" Margin="200,160,0,0" FontSize="18" FontFamily="Microsoft YaHei UI" Width="150" Height="30" MinWidth="0" />
+
+                    <Grid x:Name="OfflineLoginSettings" Visibility="Visible" Margin="0,210,0,0">
+                        <TextBlock Text="离线模式下，您无法游玩开启了正版验证的服务器。" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,0,0,0" Width="400" Height="15" FontSize="13" Foreground="Gray"/>
+                        <TextBlock Text="玩家名称" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,33,0,0" Width="80" Height="30" FontSize="18"/>
+                        <TextBox x:Name="playerName" Text="Steve" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Height="30" FontSize="15" Margin="110,30,0,0"/>
+                        <TextBlock Text="您可以随时访问 minecraft.net 以购买正版 Minecraft" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,70,0,0" Width="400" Height="15" FontSize="11" Foreground="LightGray"/>
+                    </Grid>
+
+                    <Grid x:Name="OnlineLoginSettings" Visibility="Hidden" Margin="0,210,0,0">
+                        <TextBlock Text="HarbourLauncher 仅提供微软登录入口" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,0,0,0" Width="400" Height="15" FontSize="13" Foreground="Gray"/>
+                        <Controls:Tile Title="使用微软登录到Minecraft" 
+                                TitleFontSize="14"
+                                x:Name="MicrosoftLogin"
+                                Margin="20,20,0,0"
+                                Controls:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                Background="#009900"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top" VerticalTitleAlignment="Bottom"
+                                Click="MicrosoftLogin_Click" Width="290" Height="100">
+                            <iconPacks:PackIconFontAwesome Width="30"
+                                    Height="30"
+                                    Kind="MicrosoftBrands" />
+                        </Controls:Tile>
+                    </Grid>
+
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+
+        <Controls:Tile Title="启动游戏" 
+                                x:Name="StartGame"
+                                Margin="50,210,0,0"
+                                Controls:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                Background="#3399ff"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top" VerticalTitleAlignment="Bottom"
+                                Click="StartGame_Click" Width="160" Height="120" Opacity="0.9">
+            <iconPacks:PackIconFontAwesome Width="40"
+                                    Height="40"
+                                    Kind="PlaySolid" />
+        </Controls:Tile>
+
+        <Controls:Tile Title="启动器设置" 
+                                x:Name="LauncherSettings"
+                                Margin="220,210,0,0"
+                                Controls:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                Background="#ff9966"
+                                HorizontalAlignment="Left"
+                                Click="LauncherSettings_Click"
+                                VerticalAlignment="Top" VerticalTitleAlignment="Bottom" Width="160" Height="120" Opacity="0.9">
+            <iconPacks:PackIconFontAwesome Width="40"
+                                    Height="40"
+                                    Kind="WrenchSolid" />
+        </Controls:Tile>
+
+        <Controls:Tile Title="码头市场" 
+                                x:Name="HarbourMarket"
+                                Margin="390,210,0,0"
+                                Controls:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                Background="#ff8080"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top" VerticalTitleAlignment="Bottom"
+                                Click="HarbourMarket_Click"
+                                Width="160" Height="120" Opacity="0.9">
+            <iconPacks:PackIconFontAwesome Width="40"
+                                    Height="40"
+                                    Kind="StoreSolid" />
+        </Controls:Tile>
+
+        <Controls:Tile Title="游戏设置" 
+                                x:Name="GameSettings"
+                                Margin="600,53,0,0"
+                                Controls:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                Background="Teal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top" VerticalTitleAlignment="Bottom"
+                                Click="GameSettings_Click" Width="160" Height="277" Opacity="0.9">
+            <iconPacks:PackIconFontAwesome Width="40"
+                                    Height="40"
+                                    Kind="GamepadSolid" />
+        </Controls:Tile>
+
+    </Grid>
+</Page>

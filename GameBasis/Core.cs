@@ -73,5 +73,32 @@ namespace HarbourLauncher_Reloaded.GameBasis
             File.WriteAllText(rootPath, JsonConvert.SerializeObject(configDict));
         }
 
+        public static void AutoMemRecord(bool value,string Mem)
+        {
+            rootPath = Environment.CurrentDirectory + "\\HL_config.json";
+
+            string jsonText = File.ReadAllText(rootPath);
+
+            Dictionary<string, dynamic>? configDict = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(jsonText);
+
+            configDict["autoMem"] = value;
+            configDict["maxMem"]= Mem;
+
+            File.WriteAllText(rootPath, JsonConvert.SerializeObject(configDict));
+        }
+
+        public static void WindowSizeRecord(List<int> windowSize)
+        {
+            rootPath = Environment.CurrentDirectory + "\\HL_config.json";
+
+            string jsonText = File.ReadAllText(rootPath);
+
+            Dictionary<string, dynamic>? configDict = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(jsonText);
+
+            configDict["windowSize"] = windowSize;
+
+            File.WriteAllText(rootPath, JsonConvert.SerializeObject(configDict));
+        }
+
     }
 }

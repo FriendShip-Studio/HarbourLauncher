@@ -13,6 +13,8 @@
     <None Remove="images\flips2.png" />
     <None Remove="images\flips3.png" />
     <None Remove="images\fsc.png" />
+    <None Remove="images\index_bamboo.png" />
+    <None Remove="images\index_wxg.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +37,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="images\fsc.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\index_bamboo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\index_wxg.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
