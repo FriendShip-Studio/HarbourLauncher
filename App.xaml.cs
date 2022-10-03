@@ -2,6 +2,7 @@
 using System.Net;
 using ProjBobcat.Class.Helper;
 using System.Windows;
+using ProjBobcat.DefaultComponent.Authenticator;
 
 namespace HarbourLauncher_Reloaded
 {
@@ -16,6 +17,15 @@ namespace HarbourLauncher_Reloaded
 
             ServiceHelper.Init();
             HttpClientHelper.Init();
-        }
+
+            MicrosoftAuthenticator.Configure(new ProjBobcat.Class.Model.MicrosoftAuth.MicrosoftAuthenticatorAPISettings
+            {
+                ClientId = "1aefa904-b887-4fbf-98fc-10185b7b8049",
+                TenentId = "consumers",
+                Scopes = new[] { "XboxLive.signin", "offline_access", "openid", "profile", "email" }
+            });
+
+    }
+
     }
 }
